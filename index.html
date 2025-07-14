@@ -1,137 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Money Tracker</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f2f2f2; }
-    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    input, button, select { width: 100%; margin: 10px 0; padding: 10px; }
-    .transaction { display: flex; justify-content: space-between; margin: 5px 0; }
-  </style>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Money Tracker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h2>Money Tracker</h2>
-    <div id="login">
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Password">
-      <button onclick="login()">Login</button>
+
+    <div id="auth-container" class="container">
+        <h1>My Money Tracker</h1>
+        <div class="card">
+            <h2>Login</h2>
+            <input type="email" id="email-input" placeholder="Email">
+            <input type="password" id="password-input" placeholder="Password">
+            <button id="login-btn">Login</button>
+            <p>Don't have an account? <span id="register-link">Register here.</span></p>
+        </div>
     </div>
 
-    <div id="dashboard" style="display:none;">
-      <h3 id="welcome"></h3>
-      <select id="accountList"></select>
-      <p>Starting: <span id="startBalance">0</span> | Current: <span id="currentBalance">0</span></p>
+    <div id="app-container" class="container" style="display:none;">
+        <header>
+            <nav>
+                <div class="user-info">
+                    <span id="user-email"></span>
+                    <button id="logout-btn">Logout</button>
+                </div>
+            </nav>
+        </header>
 
-      <input type="number" id="amount" placeholder="Amount">
-      <input type="text" id="note" placeholder="Note">
-      <select id="type">
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
-      <button onclick="addTransaction()">Add</button>
+        <main>
+            <h1>My Accounts</h1>
+            <div id="accounts-list" class="accounts-grid">
+                </div>
 
-      <div id="transactions"></div>
+            <button id="add-account-btn" class="add-btn">+</button>
+        </main>
     </div>
-  </div>
 
-  <script>
-    // Your Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDxvV4eWqEtyCMMzQX_dd-gT4bhwxbqXUM",
-      authDomain: "moneytrackerapp-8c001.firebaseapp.com",
-      projectId: "moneytrackerapp-8c001",
-      storageBucket: "moneytrackerapp-8c001.firebasestorage.app",
-      messagingSenderId: "1087886753321",
-      appId: "1:1087886753321:web:0f5c92bcdace0589776638"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    <div id="add-account-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Create New Account</h2>
+            <input type="text" id="account-name-input" placeholder="Account Name (e.g., Visa)">
+            <input type="number" id="account-limit-input" placeholder="Credit Limit (e.g., 5000)">
+            <input type="number" id="account-balance-input" placeholder="Current Balance">
+            <button id="save-account-btn">Save Account</button>
+        </div>
+    </div>
 
-    function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById("login").style.display = "none";
-          document.getElementById("dashboard").style.display = "block";
-          document.getElementById("welcome").innerText = `Welcome, ${email}`;
-          loadAccounts();
-        })
-        .catch(e => alert(e.message));
-    }
+    <div id="add-transaction-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="transaction-title"></h2>
+            <input type="text" id="transaction-description-input" placeholder="Description">
+            <input type="number" id="transaction-amount-input" placeholder="Amount (e.g., -50 for expense, +100 for income)">
+            <button id="save-transaction-btn">Save Transaction</button>
+        </div>
+    </div>
 
-    let selectedAccountId = null;
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
-    async function loadAccounts() {
-      const userId = auth.currentUser.uid;
-      const list = document.getElementById("accountList");
-      list.innerHTML = "";
-      const snap = await db.collection("users").doc(userId).collection("accounts").get();
-      snap.forEach(doc => {
-        const opt = document.createElement("option");
-        opt.value = doc.id;
-        opt.text = doc.data().name;
-        list.appendChild(opt);
-      });
-      list.onchange = () => {
-        selectedAccountId = list.value;
-        loadTransactions();
-      };
-      if (list.options.length > 0) {
-        selectedAccountId = list.value;
-        loadTransactions();
-      }
-    }
+    <script src="script.js"></script>
 
-    async function loadTransactions() {
-      const userId = auth.currentUser.uid;
-      const accRef = db.collection("users").doc(userId).collection("accounts").doc(selectedAccountId);
-      const accData = (await accRef.get()).data();
-      document.getElementById("startBalance").innerText = accData.startingBalance;
-      let current = accData.startingBalance;
-
-      const snap = await accRef.collection("transactions").orderBy("date", "desc").get();
-      const txDiv = document.getElementById("transactions");
-      txDiv.innerHTML = "";
-      snap.forEach(doc => {
-        const data = doc.data();
-        if (data.type === "income") current += data.amount;
-        else current -= data.amount;
-        const div = document.createElement("div");
-        div.className = "transaction";
-        div.innerText = `${data.type}: ${data.amount} | ${data.note}`;
-        txDiv.appendChild(div);
-      });
-      document.getElementById("currentBalance").innerText = current;
-    }
-
-    function addTransaction() {
-      const amount = parseFloat(document.getElementById("amount").value);
-      const note = document.getElementById("note").value;
-      const type = document.getElementById("type").value;
-      if (!amount || !note || !selectedAccountId) return;
-      const userId = auth.currentUser.uid;
-      db.collection("users").doc(userId)
-        .collection("accounts").doc(selectedAccountId)
-        .collection("transactions").add({
-          amount,
-          note,
-          type,
-          date: new Date().toISOString()
-        }).then(() => {
-          loadTransactions();
-          document.getElementById("amount").value = "";
-          document.getElementById("note").value = "";
-        });
-    }
-  </script>
 </body>
 </html>
