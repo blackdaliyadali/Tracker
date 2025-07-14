@@ -37,7 +37,7 @@ const accountBalanceInput = document.getElementById('account-balance-input');
 const saveAccountBtn = document.getElementById('save-account-btn');
 const transactionSection = document.getElementById('transaction-section');
 const backToAccountsBtn = document.getElementById('back-to-accounts-btn');
-const transactionTitle = document.getElementById('transactions-title');
+const transactionTitle = document = document.getElementById('transactions-title');
 const transactionTbody = document.getElementById('transaction-tbody');
 const addTransactionBtn = document.getElementById('add-transaction-btn');
 const addTransactionModal = document.getElementById('add-transaction-modal');
@@ -126,7 +126,6 @@ backToAccountsBtn.addEventListener('click', showAccounts);
 // --- Fetching Data from Firebase ---
 
 function fetchMonths(userId) {
-    // This is an improved, more efficient way to fetch months
     const allMonths = new Set();
     const accountsRef = db.collection('users').doc(userId).collection('accounts');
     
@@ -297,6 +296,8 @@ saveTransactionBtn.addEventListener('click', () => {
         transactionDescriptionInput.value = '';
         transactionAmountInput.value = '';
         alert('Transaction added!');
+        // THIS IS THE FIX: Re-fetch transactions to update the table
+        fetchTransactions(user.uid, currentAccountId, currentMonth, currentYear);
     }).catch(error => {
         console.error("Transaction failed: ", error);
         alert('Transaction failed. Please try again.');
