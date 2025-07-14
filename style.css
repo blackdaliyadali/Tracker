@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 900px;
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
@@ -65,11 +65,27 @@ header {
     gap: 10px;
 }
 
-.accounts-grid {
+.accounts-grid, .month-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-top: 20px;
+}
+
+.month-btn {
+    background-color: #fff;
+    color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.month-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .account-card {
@@ -133,4 +149,53 @@ header {
     right: 15px;
     font-size: 24px;
     cursor: pointer;
+}
+
+/* New Table Styles */
+#transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+#transaction-table th, #transaction-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 1.1em;
+}
+
+#transaction-table thead th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+#transaction-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.expense {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.income {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.back-btn {
+    float: left;
+    background-color: #6c757d;
+    font-size: 14px;
+    padding: 8px 15px;
+    margin-bottom: 20px;
+}
+
+.back-btn:hover {
+    background-color: #5a6268;
 }
