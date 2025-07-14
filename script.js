@@ -37,7 +37,7 @@ const accountBalanceInput = document.getElementById('account-balance-input');
 const saveAccountBtn = document.getElementById('save-account-btn');
 const transactionSection = document.getElementById('transaction-section');
 const backToAccountsBtn = document.getElementById('back-to-accounts-btn');
-const transactionTitle = document = document.getElementById('transactions-title');
+const transactionTitle = document.getElementById('transactions-title');
 const transactionTbody = document.getElementById('transaction-tbody');
 const addTransactionBtn = document.getElementById('add-transaction-btn');
 const addTransactionModal = document.getElementById('add-transaction-modal');
@@ -257,7 +257,7 @@ saveAccountBtn.addEventListener('click', () => {
 addTransactionBtn.addEventListener('click', () => {
     addTransactionModal.style.display = 'flex';
     if (currentAccountId) {
-        // You can add logic to populate the modal if needed
+        transactionModalTitle.textContent = 'Add Transaction to ' + transactionTitle.textContent.split(' - ')[0];
     }
 });
 
@@ -267,9 +267,10 @@ saveTransactionBtn.addEventListener('click', () => {
 
     const amount = parseFloat(transactionAmountInput.value);
     const description = transactionDescriptionInput.value;
-    const today = new Date();
-    const month = today.getMonth();
-    const year = today.getFullYear();
+    
+    // Use the current month and year from the page, NOT the current date
+    const month = currentMonth;
+    const year = currentYear;
 
     if (isNaN(amount) || amount === 0) {
         alert('Please enter a valid amount.');
@@ -296,7 +297,9 @@ saveTransactionBtn.addEventListener('click', () => {
         transactionDescriptionInput.value = '';
         transactionAmountInput.value = '';
         alert('Transaction added!');
-        // THIS IS THE FIX: Re-fetch transactions to update the table
+        // Re-fetch months and accounts to ensure all totals are updated
+        fetchMonths(user.uid);
+        fetchAccounts(user.uid);
         fetchTransactions(user.uid, currentAccountId, currentMonth, currentYear);
     }).catch(error => {
         console.error("Transaction failed: ", error);
